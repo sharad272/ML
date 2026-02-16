@@ -1,0 +1,30 @@
+
+Hidden layers exist so the network can bend, twist, and shape the input space to match complex real-world relationships.
+
+If there were no hidden layers, deep learning wouldn’t exist — it would just be linear regression.
+
+
+Why not just keep adding layers?
+
+Because more layers ≠ always better.
+
+1️⃣ Optimization gets harder
+
+Gradients can vanish/explode
+
+Training becomes unstable
+
+Needs tricks (ReLU, batch norm, residual connections)
+
+2️⃣ Overfitting
+
+Too many layers → memorizes data
+
+Poor performance on new data
+
+
+Overfitting  --> NN trained too much that loss function gets flattens after getting minimal value.
+Underfitting --> NN trained too less that loss function is till high
+
+
+

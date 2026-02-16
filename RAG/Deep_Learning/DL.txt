@@ -1,0 +1,80 @@
+ML depends on stastical techniques while DL is inspired by the structure of human brain 
+called Neural Networks.
+
+
+
+
+1️⃣ What is the loss function?
+
+The loss function measures the difference between:
+
+predicted output 𝑦^
+	​
+
+actual output 
+𝑦
+
+Example (Mean Squared Error):
+
+𝐿=(𝑦^ − 𝑦) 2
+
+So yes:
+
+Loss = how wrong the prediction is
+
+2️⃣ Why gradients?
+
+Because we want to minimize the loss.
+
+We compute:
+
+∂𝐿/∂𝑊
+	​
+
+
+This tells us:
+
+how changing a weight affects the error
+
+which direction reduces the error
+
+3️⃣ What weight update is doing
+
+Gradient descent:
+
+𝑊 ← 𝑊 − 𝜂∂𝐿/∂𝑊
+
+	​
+Meaning:
+if loss increases 
+when 𝑊 increases → decrease 
+
+
+if loss decreases when 
+𝑊 increases → increase 
+
+
+4️⃣ What the whole training loop really is
+
+Input → network → predicted output 𝑦^
+
+	​
+Compare 
+𝑦^
+	​
+with actual 
+𝑦
+y → compute loss
+
+Differentiate loss w.r.t. weights → gradients
+
+Update weights to reduce loss
+
+Repeat
+
+That’s all training is.
+
+5️⃣ One-line summary (very important)
+
+We compute gradients and update weights only to minimize the loss (prediction error).
+
