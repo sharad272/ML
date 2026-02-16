@@ -29,4 +29,7 @@ Why Embeddding??
 Tools:
 - OpenaIEmbeddings, SentenceTransfomerEmbeddings,etc
 
-4. 
+4. Storage in a Vector Store/db
+Tools: FAISS, Chroma, PineCone, PGvector, Elastic Search etc.
+
+
