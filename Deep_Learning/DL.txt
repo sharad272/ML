@@ -91,3 +91,12 @@ That’s all training is.
 
 We compute gradients and update weights only to minimize the loss (prediction error).
 
+
+
+
+| Task                       | Output Neurons | Activation    |
+| -------------------------- | -------------- | ------------- |
+| Binary classification      | 1              | Sigmoid       |
+| Multi-class classification | #classes       | Softmax       |
+| Regression                 | 1              | None / Linear |
+
