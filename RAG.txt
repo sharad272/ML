@@ -1,0 +1,30 @@
+RAG--> Retrieval Augumented Generation
+
+Query + Context --> LLM --> Response
+
+Indexing is the process of preparing your knowledge base so that it can be efficiently searched at query time.
+
+It consists of 4 steps
+1. Document Ingestion --> Load your source into memory.
+Ex: PDF reports, Word Documents, Github repos, SQL records etc.
+Tools:
+Langchain loaders: PyPDFLoader, YouTubeLoader etc.
+
+2. Text Chunking --> Break large documents into small, semantically meaningful chunks
+
+Why Chunk?
+- LLMs have context limits.
+- Smaller chunks are more focused --> better semantic search.
+Tools:
+RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter, SemanticCharacter
+
+
+3. Embedding Generation --> Conver each chunk into a dense vector (embeddign) that captures its meaning.
+
+
+Why Embeddding??
+- Similiar ideas close together.
+-Allows fast and fuzzy semantic search
+
+Tools:
+- OpenaIEmbeddings, SentenceTransfomerEmbeddings,etc
