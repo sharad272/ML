@@ -13,7 +13,7 @@ X ------> W -------> Activation function (Sigmoid) -----> y_prediction ---> Loss
 
 Forward Pass Computation:
 1- Linear Transformation
-   z= weight*x(input) + bias
+   z= weight*x(input) + bias  (Equation of a Straight line)
 
 2- Activation function (Sigmoid):
      yprediction 
