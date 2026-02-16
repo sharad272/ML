@@ -1,2 +1,8 @@
 Finetuning --> Retrain the pretrained Model on a small domain specific dataset.
+QLORA, LORA
 
+Supervised FineTuning
+1. Collect Data
+2. Choose a method --> Full parameter-finetuning LORA/QLORA
+3. Train for a few epochs --> Keep the base weights frozen, or partially frozen and update only a small subset (LORA) or full weights (Full Finetuning).
+4. Evaluate & Safety-test --> Based on exact-match, factuality.
