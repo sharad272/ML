@@ -1,1 +1,2 @@
-Finetuning --> Retrained the Model on a small domain specific dataset.
+Finetuning --> Retrain the pretrained Model on a small domain specific dataset.
+
