@@ -6,3 +6,9 @@ Supervised FineTuning
 2. Choose a method --> Full parameter-finetuning LORA/QLORA
 3. Train for a few epochs --> Keep the base weights frozen, or partially frozen and update only a small subset (LORA) or full weights (Full Finetuning).
 4. Evaluate & Safety-test --> Based on exact-match, factuality.
+
+
+Cons:
+1. Cost the LLM
+2. Have to have strong technical expertise
+3. Time consumed to train the Model.
