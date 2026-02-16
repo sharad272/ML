@@ -2,6 +2,9 @@ ML depends on stastical techniques while DL is a logical structure
 inspired by the structure of human brain 
 called Neural Networks.
 
+In an ANN (Artifical Neural Network), its fundamental unit is called Perceptron 
+which is connected by arrows called weights.
+
 
 
 
