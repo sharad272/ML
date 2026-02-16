@@ -5,6 +5,9 @@ called Neural Networks.
 In an ANN (Artifical Neural Network), its fundamental unit is called Perceptron 
 which is connected by arrows called weights.
 
+And weight tells you the imporatnce of inputs.
+More is the value of the weights, the more important will that input be!!
+
 In neural networks, the initial layers detect the less complex features like edges, while the deeper layers
 detects the more complex features relevant to humans like faces, numbers and so on...
 
