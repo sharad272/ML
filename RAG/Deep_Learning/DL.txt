@@ -1,4 +1,5 @@
-ML depends on stastical techniques while DL is inspired by the structure of human brain 
+ML depends on stastical techniques while DL is a logical structure 
+inspired by the structure of human brain 
 called Neural Networks.
 
 
