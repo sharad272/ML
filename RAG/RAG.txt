@@ -28,3 +28,5 @@ Why Embeddding??
 
 Tools:
 - OpenaIEmbeddings, SentenceTransfomerEmbeddings,etc
+
+4. 
