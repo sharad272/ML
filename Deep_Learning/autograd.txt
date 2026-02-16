@@ -1,0 +1,136 @@
+Training Process of the neural network:
+1- Forward Pass --> Compute the output of the network
+2- Loss Function --> Calculate the Loss Function 
+3- Backward Pass (BackPropogation) --> Compute the gradients of the Loss with respect to parameters
+4- Update gradients --> Adjust the parameters using an optimisation algorithm (e.g. gradient descent)
+
+
+
+
+X ------> W -------> Activation function (Sigmoid) -----> y_prediction ---> Loss
+(Input)   (Weight)          bias
+
+
+Forward Pass Computation:
+1- Linear Transformation
+   z= weight*x(input) + bias
+
+2- Activation function (Sigmoid):
+     yprediction 
+
+
+
+Loss Function (Binary Cross- Entropy Level)
+
+
+Neural Network is just like a nested functions of derivatives which manually done is almost impossible.
+
+That's why we need autograd which automatic compute the derivatives for the tensor operations.
+
+
+
+PyTorch creates computation graph when backward() (Calculate derivatives) function is being called.
+
+
+Start with random weights → see how wrong you are → use gradients to adjust → repeat until the error can’t be reduced anymore.
+
+We will stop training the NN until the loss function ~ 0 (minimal) or gets flattens i.e. gives the same value.
+
+When gradients are tiny and loss no longer improves on new data, there’s nothing useful left to learn.
+
+
+
+
+How training really works (step by step)
+
+1️⃣ Initialize weights randomly
+We don’t know anything at the start, so:
+
+𝑊
+∼
+random
+W∼random
+
+2️⃣ Forward pass
+Use current weights to compute prediction:
+
+3️⃣ Compute loss
+Measure how wrong the prediction is:
+
+4️⃣ Compute gradients
+Differentiate loss w.r.t. weights:
+
+
+This tells us how to change weights to reduce loss.
+
+5️⃣ Update weights
+	​
+
+6️⃣ Repeat
+Do this many times until: Loss function becomes mimimised
+
+
+
+
+Why bias is needed (intuition)
+
+Without bias:
+
+𝑧 = 𝑊𝑥z Wx
+
+This forces:
+
+output = 0 when input = 0
+
+decision boundary must pass through origin
+
+That’s very restrictive.
+
+Bias lets the neuron:
+
+activate even when inputs are zero
+
+shift decision boundaries left/right
+
+
+
+Simple example
+
+With bias:
+
+𝑦 = 2𝑥 + 3
+y=2x+3
+
+Without bias:
+
+𝑦=2𝑥 
+
+y=2x
+
+You can’t represent +3
++3 without bias.
+
+Bias lets the model fit data that doesn’t pass through zero.
+
+What bias really does
+
+A neuron computes:
+
+𝑧 = 𝑊𝑥 + 𝑏
+
+
+If input 
+x=0:   
+
+then
+z=b
+
+So yes:
+
+Bias determines the neuron’s output when the input is zero.
+
+
+We don’t use sigmoid in hidden layers because its mathematical form forces the gradient toward zero when the input value becomes largely +ve  or -ve i.e. linear resprsentation which is a straight line only.
+
+
+While activation function like Relu can detect non-linear representation which covers much of the info or data points.
