@@ -1,0 +1,72 @@
+Normalization means:
+
+We scale the vector so its length (magnitude) becomes 1
+
+This is usually called L2 normalization.
+
+
+
+Without normalization:
+
+Similarity depends on:
+
+Direction
+
+Magnitude
+
+With normalization:
+
+Only direction matters
+
+And in semantic similarity, direction captures meaning.
+
+
+
+We normalize embeddings to ensure similarity comparisons are based purely on angular distance rather than vector magnitude. This stabilizes retrieval ranking, enables efficient inner-product search, and prevents magnitude bias during training or inference.
+
+
+cos(A,B) = A.B/|A|.|B|
+
+But after normalization,
+
+|A| = |B| = 1
+
+Then,
+
+cos(A,B) = A.B (Inner Product)
+
+
+
+
+Think of embeddings like arrows.
+
+Normalization:
+
+Keeps all arrows same length
+
+Only direction matters
+
+Direction = meaning
+Length = confidence / magnitude noise
+
+
+
+Normalize when:
+
+Using cosine similarity
+
+Doing retrieval (RAG)
+
+Using contrastive loss
+
+Semantic search
+
+CLIP-like systems
+
+❌ Don't normalize when:
+
+Magnitude itself carries meaning
+
+Using Euclidean distance intentionally
+
+Some classification heads
