@@ -5,7 +5,16 @@ called Neural Networks.
 In an ANN (Artifical Neural Network), its fundamental unit is called Perceptron 
 which is connected by arrows called weights.
 
+In neural networks, the initial layers detect the less complex features like edges, while the deeper layers
+detects the more complex features relevant to humans like faces, numbers and so on...
 
+
+
+ML wins for less data while if the data is more DL wins. 
+Also in ML, it requires you to extract features.
+
+In DL, the more you provide the data, more good would be its performance! 
+Extraction of Features does not happen in DL.
 
 
 1️⃣ What is the loss function?
