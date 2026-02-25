@@ -1,1 +1,2 @@
-
+Perceptron is a fundamental unit of ANN.
+It works only on linear data.
