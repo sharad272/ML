@@ -31,11 +31,29 @@ class HybridRetriever:
         dense_scores = np.array(dense_scores)
         sparse_scores = np.array(sparse_scores)
 
-        if dense_scores.max() != 0:
-            dense_scores = dense_scores / dense_scores.max()
+        if dense_scores.size:
+            dense_scores = dense_scores.astype(np.float64, copy=False)
+            dense_max = dense_scores.max()
+            if np.isfinite(dense_max) and dense_max > 1e-12:
+                dense_scores = np.divide(
+                    dense_scores,
+                    dense_max,
+                    out=np.zeros_like(dense_scores),
+                    where=np.isfinite(dense_scores)
+                )
+                dense_scores = np.nan_to_num(dense_scores, nan=0.0, posinf=1.0, neginf=0.0)
 
-        if sparse_scores.max() != 0:
-            sparse_scores = sparse_scores / sparse_scores.max()
+        if sparse_scores.size:
+            sparse_scores = sparse_scores.astype(np.float64, copy=False)
+            sparse_max = sparse_scores.max()
+            if np.isfinite(sparse_max) and sparse_max > 1e-12:
+                sparse_scores = np.divide(
+                    sparse_scores,
+                    sparse_max,
+                    out=np.zeros_like(sparse_scores),
+                    where=np.isfinite(sparse_scores)
+                )
+                sparse_scores = np.nan_to_num(sparse_scores, nan=0.0, posinf=1.0, neginf=0.0)
 
         # Combine into dictionary
         combined_scores = {}

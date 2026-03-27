@@ -1,5 +1,10 @@
 import os
+import sys
 import numpy as np
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
 
 from chunking.structure_aware_chunking import extract_chunks
 from chunking.recursive_chunking import recursive_split_chunk
@@ -7,6 +12,135 @@ from embedding.embedding import Embedder
 from retrieval.faiss_index import FaissIndexer
 from retrieval.bm25_retriever import BM25Retriever
 from retrieval.hybrid_retriever import HybridRetriever
+
+if load_dotenv is not None:
+    load_dotenv()
+
+
+def get_rag_llm_model():
+    # Pick a default instruction model that performs well with grounded context.
+    return os.getenv("HF_RAG_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+
+
+def build_rag_context(
+    reranked_results,
+    all_chunks,
+    max_chunks=3,
+    max_chars_per_chunk=1200,
+    query=None
+):
+    # Convert top retrieved chunks into a compact, citation-like context block.
+    context_blocks = []
+    seen_signatures = set()
+    stopwords = {
+        "a", "an", "the", "of", "to", "in", "at", "on", "and", "or", "for",
+        "was", "were", "is", "are", "who", "what", "when", "where", "how"
+    }
+    query_terms = set()
+    if query:
+        query_terms = {
+            token.strip(".,!?;:'\"()[]{}").lower()
+            for token in query.split()
+            if token.strip(".,!?;:'\"()[]{}")
+        }
+        query_terms = {token for token in query_terms if token not in stopwords}
+
+    def select_best_window(text):
+        if len(text) <= max_chars_per_chunk or not query_terms:
+            return text
+        lowered = text.lower()
+        window_size = max_chars_per_chunk
+        step = max(120, window_size // 6)
+        best_start = 0
+        best_score = -1.0
+        max_start = max(0, len(text) - window_size)
+
+        for start in range(0, max_start + 1, step):
+            end = min(len(text), start + window_size)
+            window = lowered[start:end]
+            term_hits = sum(1 for term in query_terms if term in window)
+            term_ratio = term_hits / len(query_terms)
+            score = term_hits + (0.4 * term_ratio)
+            if score > best_score:
+                best_score = score
+                best_start = start
+
+        final_end = min(len(text), best_start + window_size)
+        return text[best_start:final_end]
+
+    # Keep reranker score primary, with a small boost for lexical coverage.
+    candidates = []
+    for base_score, idx in reranked_results:
+        chunk_text = all_chunks[idx].get("text", "")
+        overlap_hits = sum(1 for term in query_terms if term in chunk_text.lower()) if query_terms else 0
+        overlap_ratio = overlap_hits / len(query_terms) if query_terms else 0.0
+        adjusted_score = (0.85 * base_score) + (0.15 * overlap_ratio)
+        candidates.append((adjusted_score, idx))
+
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    rank = 1
+    for _, idx in candidates:
+        if rank > max_chunks:
+            break
+        chunk = all_chunks[idx]
+        metadata = chunk.get("metadata", {})
+        source_name = metadata.get("name") or metadata.get("file_path", "unknown")
+        text = chunk.get("text", "")
+
+        # Skip near-duplicate chunks so context budget goes to diverse evidence.
+        signature = " ".join(text.lower().split())[:280]
+        if signature in seen_signatures:
+            continue
+        seen_signatures.add(signature)
+
+        text = select_best_window(text)
+        if len(text) > max_chars_per_chunk:
+            text = text[:max_chars_per_chunk] + "..."
+        context_blocks.append(f"[{rank}] Source: {source_name}\n{text}")
+        rank += 1
+    return "\n\n".join(context_blocks)
+
+
+def generate_rag_answer(query, context, model_name=None):
+    # Call Hugging Face Inference API with token auth and grounded prompt.
+    hf_token = os.getenv("HF_TOKEN")
+    if not hf_token:
+        raise ValueError(
+            "Missing Hugging Face token. Set HF_TOKEN in environment or .env file."
+        )
+
+    if model_name is None:
+        model_name = get_rag_llm_model()
+
+    try:
+        from huggingface_hub import InferenceClient
+    except ImportError:
+        raise ImportError(
+            "Missing dependency 'huggingface_hub'. Install it with: "
+            "pip install huggingface_hub"
+        )
+
+    client = InferenceClient(token=hf_token)
+    system_prompt = (
+        "You are a RAG assistant. Answer only using the retrieved context. "
+        "If the answer is not in context, clearly say you do not have enough information."
+    )
+    user_prompt = (
+        f"Question:\n{query}\n\n"
+        f"Retrieved context:\n{context}\n\n"
+        "Give a concise answer and cite sources as [1], [2], etc."
+    )
+
+    completion = client.chat.completions.create(
+        model=model_name,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        max_tokens=300,
+        temperature=0.2,
+    )
+    return completion.choices[0].message.content, model_name
 
 
 def load_supported_files(root_dir):
@@ -73,6 +207,17 @@ def rerank_results(
     if not candidate_indices:
         return []
 
+    stopwords = {
+        "a", "an", "the", "of", "to", "in", "at", "on", "and", "or", "for",
+        "was", "were", "is", "are", "who", "what", "when", "where", "how"
+    }
+    query_terms = {
+        token.strip(".,!?;:'\"()[]{}").lower()
+        for token in query.split()
+        if token.strip(".,!?;:'\"()[]{}")
+    }
+    query_terms = {token for token in query_terms if token not in stopwords}
+
     reranked = []
     query_embedding = embedder.model.encode(
         query,
@@ -80,11 +225,17 @@ def rerank_results(
     )
 
     for idx in candidate_indices:
+        chunk_text = all_chunks[idx]["text"]
         chunk_embedding = embedder.model.encode(
-            all_chunks[idx]["text"],
+            chunk_text,
             normalize_embeddings=True
         )
-        score = float(np.dot(query_embedding, chunk_embedding))
+        semantic_score = float(np.dot(query_embedding, chunk_embedding))
+        chunk_lower = chunk_text.lower()
+        overlap_hits = sum(1 for term in query_terms if term in chunk_lower)
+        overlap_ratio = overlap_hits / len(query_terms) if query_terms else 0.0
+        # Blend semantic similarity with lexical overlap so exact-fact chunks survive.
+        score = 0.8 * semantic_score + 0.2 * overlap_ratio
         reranked.append((score, idx))
 
     # Cross-encoder reranking path (kept commented intentionally).
@@ -136,32 +287,24 @@ def evaluate_retrieval_metrics(retrieved_indices, relevant_indices, k_values=(1,
 
 
 def main():
-    root_directory = "."   # current project folder
+    # Require explicit user-provided files (no automatic local directory scanning).
+    provided_files = [path for path in sys.argv[1:] if os.path.exists(path)]
+    if not provided_files:
+        print(
+            "No user-provided context files found.\n"
+            "Provide file paths explicitly, e.g.:\n"
+            "python main.py ./file.pdf ./notes.txt ./module.py\n"
+            "Or use streamlit_app.py to upload files from frontend."
+        )
+        return
 
-    # Store every chunk that will be embedded and indexed.
     all_chunks = []
+    print(f"Using {len(provided_files)} user-provided file(s).")
 
-    # Discover all candidate files for ingestion.
-    supported_files = load_supported_files(root_directory)
-    print(f"Found {len(supported_files)} supported files (.py/.pdf)")
-
-    # Process each discovered file into chunk objects.
-    for file_path in supported_files:
-        # if file_path.endswith(".py"):
-        #     with open(file_path, "r", encoding="utf-8") as f:
-        #         content = f.read()
-
-        #     structure_chunks = extract_chunks(content, file_path)
-
-        #     for chunk in structure_chunks:
-        #         sub_chunks = recursive_split_chunk(chunk)
-        #         all_chunks.extend(sub_chunks)
-
+    for file_path in provided_files:
         if file_path.endswith(".pdf"):
-            # 1) Extract raw PDF text.
             content = read_pdf_text(file_path)
-            # 2) Create a base chunk with metadata.
-            pdf_chunk = {
+            base_chunk = {
                 "text": content,
                 "metadata": {
                     "file_path": file_path,
@@ -170,12 +313,44 @@ def main():
                     "language": "text"
                 }
             }
-            # 3) Split large text into overlap-aware smaller chunks.
-            sub_chunks = recursive_split_chunk(pdf_chunk)
-            # 4) Add sub-chunks to the global corpus.
-            all_chunks.extend(sub_chunks)
+            all_chunks.extend(recursive_split_chunk(base_chunk))
+            continue
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except UnicodeDecodeError:
+            with open(file_path, "r", encoding="latin-1", errors="ignore") as f:
+                content = f.read()
+
+        if not content.strip():
+            continue
+
+        if file_path.endswith(".py"):
+            try:
+                structure_chunks = extract_chunks(content, file_path)
+                for chunk in structure_chunks:
+                    all_chunks.extend(recursive_split_chunk(chunk))
+                continue
+            except Exception:
+                # Fall back to generic chunking for invalid Python files.
+                pass
+
+        generic_chunk = {
+            "text": content,
+            "metadata": {
+                "file_path": file_path,
+                "type": "GenericDocument",
+                "name": os.path.basename(file_path),
+                "language": os.path.splitext(file_path)[1].lstrip(".") or "text"
+            }
+        }
+        all_chunks.extend(recursive_split_chunk(generic_chunk))
 
     print(f"Total chunks from all files: {len(all_chunks)}")
+    if not all_chunks:
+        print("No readable content extracted from provided files.")
+        return
 
     # Encode chunks into dense vectors.
     embedder = Embedder()
@@ -201,7 +376,7 @@ def main():
     # cross_encoder = load_cross_encoder()
 
     # Query to test retrieval + reranking.
-    query = "How did Pablo Neruda know that somebody behind him was looking at him?"
+    query = "Who was the woman found in the car at Havana Riviera Hotel?"
     # Retrieve broader candidate set from hybrid retriever.
     scores, indices = hybrid.search(query, embedder, alpha=0.6, top_k=10)
     # Reorder top candidates with bi-encoder reranking.
@@ -210,7 +385,7 @@ def main():
         candidate_indices=indices,
         all_chunks=all_chunks,
         embedder=embedder,
-        top_k=3
+        top_k=10
     )
 
     print("\nHybrid Results:")
@@ -224,6 +399,23 @@ def main():
         print(f"\nRerank Score: {score}")
         print("Metadata:", all_chunks[idx]["metadata"])
         print("-" * 50)
+
+    if reranked_results:
+        context = build_rag_context(
+            reranked_results,
+            all_chunks,
+            max_chunks=5,
+            query=query
+        )
+        try:
+            answer, model_used = generate_rag_answer(query, context)
+            print("\nRAG Answer:")
+            print(f"Model: {model_used}")
+            print(answer)
+        except Exception as e:
+            print(f"\nRAG generation skipped: {e}")
+    else:
+        print("\nRAG generation skipped: no retrieved chunks.")
 
     # Metrics evaluation using labeled relevant chunk indices.
     # Fill this set when running offline evaluation. Example: {2, 7}
