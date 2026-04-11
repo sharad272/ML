@@ -1,0 +1,35 @@
+Langraph --> It executes complex workflow, better control flow in the form of graph (nodes, edges).
+
+Langgraph is an orchestration framework that enables you to build sateful, multi-step, evant-driven workflows using LLMs.
+
+Think of Langraph as a flowchar engine for LLMs -- you define the steps(nodes), how thet're connected (edges) and the logic that governs the transitions. Langgraph takes care of the state management, conditional branching, looping pausing/resuming and fault recovery.
+
+
+
+Langchain--> Stateless
+Langgraph --> Stateful. It maintains the State and it will be in sync with all the nodwes of the graph.
+
+
+Tyes of Workflow execution:
+Sequential --> Langchain suits here.
+Event driven --> Langchain is not suited here. Langgraph provides this feature.
+
+
+After execution of any node in the graph, langgraph creates a checkpoint or take a snapshot to resume/recover the ealier state version.
+
+Useful for reusable workflows.
+
+Multiple workflows can be built inside a big main workflow.
+
+Subgraphs --> It is a graph that is used as a node in another graph.
+
+Can be used in multi-agents --> multiple agents working.
+
+
+
+Langchain --> For simple, linear workflows.
+Langgraph --> For complex, non-linear workflows.
+
+
+ 
+
