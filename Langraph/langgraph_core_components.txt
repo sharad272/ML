@@ -20,4 +20,39 @@ Input --> LLm call generator --> LLM call evaluator  ---> Output
 
 
 
-Graphs, Nodes & Edges:
+Graphs, Nodes & Edges: 
+Node: It is a python function. It represents each task. What to execute.
+Edges: It connects the nodes. It decides the flow. When to execute.
+
+State: It is the shared memory that flows through the LLM workflow. It holds all the data that passed through nodes as the graph runs.
+It is stored in key-value pairs.
+It is accessible to all the nodes in the graoh.
+State is mutable.
+
+
+Reducers: It defines how updates from nodes are applied to the shared state.
+Each key in the state can have its own reducer, which determines whether new data replaces, merges or adds to the existing value.
+
+
+Langgraph Execution Model:
+You define:
+State
+Nodes
+Edges
+
+Compilation of the graph.
+.complie() on the StateGraph
+
+Invocation:
+You run the graph .invoke(initial_state)
+from the root node of the graph.
+
+Super Step: 
+Excution proceed in rounds (|| execution / calling) .
+
+Merges through the reducer
+
+Execution stops when no active nodes and no messages are in transit.
+
+
+
