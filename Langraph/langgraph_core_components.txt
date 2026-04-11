@@ -50,6 +50,8 @@ from the root node of the graph.
 Super Step: 
 Excution proceed in rounds (|| execution / calling) .
 
+Message passing --> Updates or pushes the state to the next node through edges.
+
 Merges through the reducer
 
 Execution stops when no active nodes and no messages are in transit.
