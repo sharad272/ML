@@ -1,7 +1,11 @@
-Persisitence in Langgraoh refres to the ability to save and restore the state of a workflow over time.
+- Persisitence in Langgraoh refres to the ability to save and restore the state of a workflow over time.
 
-Once the graph comes to END, it lost the state value, while persisitent allows us to save the state of the graph, even after the graph reaches the END point.
+- Once the graph comes to END, it lost the state value, while persisitent allows us to save the state     of the graph (in the RAM or can be in db), even after the graph reaches the END point.
 
+
+Human in the loop: When human input is set to any node in a workflow, it terminates the program to wait for human input. When given, it resumes from where it terminated.
+
+Time travel: Replay the execution of the workflow with using checkpoint to replay the execution from that part of the workflow.
 
 
 
