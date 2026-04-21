@@ -1,0 +1,1 @@
+Persisitence in Langgraoh refres to the ability to save and restore the state of a workflow over time.
