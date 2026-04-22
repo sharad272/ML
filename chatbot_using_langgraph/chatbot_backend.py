@@ -38,7 +38,7 @@ def chat_node(state: ChatState):
 
 
 
-checkpointer = MemorySaver()
+#checkpointer = MemorySaver()
 graph = StateGraph(ChatState)
 graph.add_node('chat_node',chat_node)
 
@@ -46,7 +46,8 @@ graph.add_edge(START,'chat_node')
 graph.add_edge('chat_node',END)
 
 # If checkpoint is there then we ned to pass thread_id to the frontend too!
-chatbot = graph.compile(checkpointer=checkpointer)
+#chatbot = graph.compile(checkpointer=checkpointer)
+chatbot = graph.compile()
 
 
 

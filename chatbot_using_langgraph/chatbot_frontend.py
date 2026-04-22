@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 import streamlit as st
 from chatbot_backend import chatbot
 
-CONFIG = {"configurable": {"thread_id": 1}}
+#CONFIG = {"configurable": {"thread_id": 1}}
 
 user_input = st.chat_input('Type here')
 
@@ -19,8 +19,8 @@ if user_input:
 
     # Call LLM
     response = chatbot.invoke(
-        {'messages': [HumanMessage(content=user_input)]},
-        config=CONFIG
+        {'messages': [HumanMessage(content=user_input)]}
+        #,config=CONFIG
     )['messages'][-1].content
 
     # Add assistant message
@@ -29,8 +29,6 @@ if user_input:
         'content': response
     })
 
-    # # Force rerun so UI updates cleanly
-    # st.rerun()
 
 # Display history (ONLY place where rendering happens)
 for message in st.session_state['message_history']:
