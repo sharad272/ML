@@ -4,5 +4,4 @@ langchain-core
 langgraph
 langchain-huggingface
 python-dotenv
-huggingface-hub
 tiktoken
