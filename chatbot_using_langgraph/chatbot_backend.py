@@ -1,3 +1,4 @@
+from langchain_core import messages
 from langgraph.graph import StateGraph, START, END
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from typing import TypedDict, List,Annotated
@@ -44,7 +45,13 @@ graph.add_node('chat_node',chat_node)
 graph.add_edge(START,'chat_node')
 graph.add_edge('chat_node',END)
 
+# If checkpoint is there then we ned to pass thread_id to the frontend too!
 chatbot = graph.compile(checkpointer=checkpointer)
 
-# If checkpoint is there then we ned to pass thread_id to the frontend too!
+
+
+
+
+
+
 
