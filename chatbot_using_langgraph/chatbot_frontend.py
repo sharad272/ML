@@ -20,7 +20,6 @@ if user_input:
     # Call LLM
     response = chatbot.invoke(
         {'messages': [HumanMessage(content=user_input)]}
-        #,config=CONFIG
     )['messages'][-1].content
 
     # Add assistant message
