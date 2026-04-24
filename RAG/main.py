@@ -19,7 +19,7 @@ if load_dotenv is not None:
 
 def get_rag_llm_model():
     # Pick a default instruction model that performs well with grounded context.
-    return os.getenv("HF_RAG_MODEL", "openai/gpt-oss-120b")
+    return os.getenv("HF_RAG_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 
 
 def build_rag_context(
