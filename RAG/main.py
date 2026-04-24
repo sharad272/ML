@@ -103,7 +103,7 @@ def build_rag_context(
 
 def generate_rag_answer(query, context, model_name=None):
     # Call Hugging Face Inference API with token auth and grounded prompt.
-    hf_token = os.getenv("HF_TOKEN")
+    hf_token = os.getenv("HUGGINGFACE_API_KEY")
     if not hf_token:
         raise ValueError(
             "Missing Hugging Face token. Set HF_TOKEN in environment or .env file."
