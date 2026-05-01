@@ -14,7 +14,7 @@ Fedback
 
 Core conecepts:
 1) Project: AI application is called project.
-2) Trace: One single execution is called Trace.
+2) Trace: One single execution of the whole application is called Trace.
 3) Run: Execution through componenets i.e. Prompt, LLM, Parser in the example given below.
 
 user -> Prompt -> LLM -> Parser
