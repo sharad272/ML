@@ -1,0 +1,2 @@
+LangSmith is a unified observability & evalautaion platform where teams can debug, test, and monitor AI 
+app performance.
