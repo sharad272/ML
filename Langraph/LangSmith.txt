@@ -27,3 +27,6 @@ For Langgraph,
 4) If a worflow branches, (conditional/ ||/ subgraph), Langsmith captures which path was executed.
 
 LangSmith also monitors, it can set up alerts to notify you when the metrics drift. E,g. A spike in latency, higher error rates or unexpected cost growth.
+
+
+Evalauation: With Langsmith, we can mesaure the accuracym of your LLM outputs. Yiou can run test aganist the gold standard datasets, even custom python evaluators.
