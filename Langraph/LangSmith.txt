@@ -20,4 +20,9 @@ Core conecepts:
 user -> Prompt -> LLM -> Parser
 
 
+For Langgraph,
+1) Every graph execution can be logged in LangSmith as a trace.
+2) Each Node becomes a run inside the trace. (act as a component)
+3) You can visualize the path taken:
+4) If a worflow branches, (conditional/ ||/ subgraph), Langsmith captures which path was executed.
 
