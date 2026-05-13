@@ -1,0 +1,8 @@
+HITL (Human in the loop) is a design approach in AI systems where a human actively participates at crictical points of the 
+AI workflow.
+
+Why HITL exists?
+1) To help agentic systems
+2) To add accountability
+
+
