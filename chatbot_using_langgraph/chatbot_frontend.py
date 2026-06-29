@@ -1,13 +1,17 @@
 from langchain_core.messages import HumanMessage
 import streamlit as st
 from chatbot_backend import chatbot
+import uuid
 
-#CONFIG = {"configurable": {"thread_id": 1}}
-
-user_input = st.chat_input('Type here')
+if 'thread_id' not in st.session_state:
+    st.session_state['thread_id'] = str(uuid.uuid4())
 
 if 'message_history' not in st.session_state:
     st.session_state['message_history'] = []
+
+CONFIG = {"configurable": {"thread_id": st.session_state['thread_id']}}
+
+user_input = st.chat_input('Type here')
 
 # Handle new input FIRST
 if user_input:
@@ -19,7 +23,8 @@ if user_input:
 
     # Call LLM
     response = chatbot.invoke(
-        {'messages': [HumanMessage(content=user_input)]}
+        {'messages': [HumanMessage(content=user_input)]},
+        config=CONFIG
     )['messages'][-1].content
 
     # Add assistant message
